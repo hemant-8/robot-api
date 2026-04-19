@@ -38,10 +38,12 @@ pipeline {
                     docker run --rm \
                     -e SONAR_HOST_URL=http://host.docker.internal:9000 \
                     -e SONAR_TOKEN=$SONAR_TOKEN \
-                    -e SONAR_PROJECT_KEY=robot-api \
-                    -e SONAR_SOURCES=. \
                     -v $(pwd):/usr/src \
-                    sonarsource/sonar-scanner-cli
+                    sonarsource/sonar-scanner-cli \
+                    -Dsonar.projectKey=robot-api \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://host.docker.internal:9000 \
+                    -Dsonar.token=$SONAR_TOKEN
                     '''
                 }
             }
