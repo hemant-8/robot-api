@@ -21,14 +21,20 @@ public class BasicAuthenticationHandler
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        Context.Response.Headers.Add("WWW-Authenticate", "Basic");
-
-        var authHeader = Context.Request.Headers["Authorization"].ToString();
-
-        if (string.IsNullOrEmpty(authHeader))
+        // 🔥 FIX 1: Swagger bypass (no popup)
+        if (Context.Request.Path.StartsWithSegments("/swagger"))
         {
+            return Task.FromResult(AuthenticateResult.NoResult());
+        }
+
+        // 🔥 FIX 2: only add header when needed (not always)
+        if (!Context.Request.Headers.ContainsKey("Authorization"))
+        {
+            Context.Response.Headers.Add("WWW-Authenticate", "Basic");
             return Task.FromResult(AuthenticateResult.Fail("Missing Header"));
         }
+
+        var authHeader = Context.Request.Headers["Authorization"].ToString();
 
         try
         {
@@ -62,7 +68,7 @@ public class BasicAuthenticationHandler
                 new Claim(ClaimTypes.Role, user.Role ?? "User")
             };
 
-            var identity = new ClaimsIdentity(claims, "Basic");
+            var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 

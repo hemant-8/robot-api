@@ -25,7 +25,8 @@ builder.Services.AddSwaggerGen(options =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
-    options.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+    // 🔥 FIX: same name as authentication scheme
+    options.AddSecurityDefinition("BasicAuthentication", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
@@ -42,7 +43,7 @@ builder.Services.AddSwaggerGen(options =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "basic"
+                    Id = "BasicAuthentication"
                 }
             },
             new string[] {}
@@ -53,13 +54,14 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IRobotCommandDataAccess, RobotCommandEF>();
 builder.Services.AddScoped<IMapDataAccess, MapEF>();
 builder.Services.AddScoped<RobotContext>();
-
 builder.Services.AddScoped<UserDataAccess>();
 
+// 🔥 Authentication
 builder.Services.AddAuthentication("BasicAuthentication")
-    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>
-    ("BasicAuthentication", null);
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(
+        "BasicAuthentication", null);
 
+// 🔥 Authorization policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly",
@@ -73,11 +75,12 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 
+// 🔥 Swagger (works in Docker + no popup)
 app.UseSwagger();
 app.UseSwaggerUI(setup =>
 {
     setup.SwaggerEndpoint("/swagger/v1/swagger.json", "Robot API V1");
-    setup.RoutePrefix = string.Empty; // 🔥 IMPORTANT LINE
+    setup.RoutePrefix = string.Empty;
     setup.InjectStylesheet("/styles/theme-flattop.css");
 });
 

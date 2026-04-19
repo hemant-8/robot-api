@@ -8,6 +8,9 @@ RUN dotnet publish robot-controller-api.csproj -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
+# 🔥 IMPORTANT FIX
+ENV ASPNETCORE_ENVIRONMENT=Development
+
 COPY --from=build /app/out .
 
 ENTRYPOINT ["dotnet", "robot-controller-api.dll"]
