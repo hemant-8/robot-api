@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
 using robot_controller_api.Persistence;
 using robot_controller_api.Models;
 
@@ -21,13 +20,13 @@ public class BasicAuthenticationHandler
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        // 🔥 FIX 1: Swagger bypass (no popup)
+        // 🔥 Swagger bypass (no popup)
         if (Context.Request.Path.StartsWithSegments("/swagger"))
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        // 🔥 FIX 2: only add header when needed (not always)
+        // 🔥 Check Authorization header
         if (!Context.Request.Headers.ContainsKey("Authorization"))
         {
             Context.Response.Headers.Add("WWW-Authenticate", "Basic");
@@ -54,10 +53,8 @@ public class BasicAuthenticationHandler
                 return Task.FromResult(AuthenticateResult.Fail("User not found"));
             }
 
-            var hasher = new PasswordHasher<UserModel>();
-            var result = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
-
-            if (result == PasswordVerificationResult.Failed)
+            // 🔥 FINAL FIX: plain password match (for demo)
+            if (user.PasswordHash != password)
             {
                 return Task.FromResult(AuthenticateResult.Fail("Wrong password"));
             }
