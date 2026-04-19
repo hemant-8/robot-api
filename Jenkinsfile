@@ -3,12 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/hemant-8/robot-api.git'
-            }
-        }
-
         stage('Build') {
             steps {
                 sh 'dotnet build robot-controller-api.sln'
