@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="robot-controller-api/robot-controller-api.csproj" />
+  <Project Path="RobotApi.Tests/RobotApi.Tests.csproj" />
+</Solution>

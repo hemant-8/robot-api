@@ -1,0 +1,15 @@
+# build folders
+bin/
+obj/
+
+# visual studio
+.vs/
+
+# logs
+*.log
+
+# user files
+*.user
+
+# OS files
+.DS_Store
