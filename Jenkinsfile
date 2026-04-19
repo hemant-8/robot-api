@@ -4,18 +4,33 @@ pipeline {
     stages {
 
         stage('Build') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:10.0'
+                }
+            }
             steps {
                 sh 'dotnet build robot-controller-api.sln'
             }
         }
 
         stage('Test') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:10.0'
+                }
+            }
             steps {
                 sh 'dotnet test robot-controller-api.sln || true'
             }
         }
 
         stage('Code Quality') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:10.0'
+                }
+            }
             steps {
                 sh 'dotnet format robot-controller-api.sln || true'
             }
