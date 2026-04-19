@@ -103,7 +103,7 @@ pipeline {
                     Project: ${JOB_NAME}
                     Build Number: ${BUILD_NUMBER}
 
-                    Check details: ${BUILD_URL}
+                    Check details:
                     """,
                     attachLog: true
                 )
@@ -119,7 +119,7 @@ pipeline {
                     Project: ${JOB_NAME}
                     Build Number: ${BUILD_NUMBER}
 
-                    Check logs: ${BUILD_URL}
+                    Check logs: 
                     """,
                     attachLog: true
                 )
