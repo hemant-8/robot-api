@@ -1,0 +1,21 @@
+#GetRobotCommands:
+SELECT r.id, r.createddate, r.description, r.ismovecommand, r.modifieddate, r."Name"
+FROM robotcommand AS r
+
+#InsertRobotCommand:
+INSERT INTO robotcommand (createddate, description, ismovecommand, modifieddate, "Name")
+VALUES (@p0, @p1, @p2, @p3, @p4)
+RETURNING id;
+
+#UpdateRobotCommand:
+UPDATE robotcommand
+SET "Name"=@p0, description=@p1, ismovecommand=@p2, modifieddate=@p3
+WHERE id=@p4;
+
+#DeleteRobotCommand:
+DELETE FROM robotcommand
+WHERE id=@p0;
+
+#GetMaps:
+SELECT m.id, m.columns, m.rows, m.name, m.description, m.createddate, m.modifieddate
+FROM map AS m;
