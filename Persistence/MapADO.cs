@@ -5,13 +5,18 @@ namespace robot_controller_api.Persistence;
 
 public class MapADO : IMapDataAccess
 {
-    private const string CONNECTION_STRING = "Host=localhost;Username=postgres;Password=Hemant@123;Database=sit331";
+    private readonly string _connectionString;
+
+    public MapADO(IConfiguration config)
+    {
+        _connectionString = config.GetConnectionString("DefaultConnection");
+    }
 
     public List<Map> GetMaps()
     {
         var maps = new List<Map>();
 
-        using var conn = new NpgsqlConnection(CONNECTION_STRING);
+        using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
         using var cmd = new NpgsqlCommand("SELECT * FROM map", conn);

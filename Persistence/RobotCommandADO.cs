@@ -5,13 +5,18 @@ namespace robot_controller_api.Persistence;
 
 public class RobotCommandADO : IRobotCommandDataAccess
 {
-    private const string CONNECTION_STRING = "Host=localhost;Username=postgres;Password=Hemant@123;Database=sit331";
+    private readonly string _connectionString;
+
+    public RobotCommandADO(IConfiguration config)
+    {
+        _connectionString = config.GetConnectionString("DefaultConnection");
+    }
 
     public List<RobotCommand> GetRobotCommands()
     {
         var robotCommands = new List<RobotCommand>();
 
-        using var conn = new NpgsqlConnection(CONNECTION_STRING);
+        using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
         using var cmd = new NpgsqlCommand("SELECT * FROM robotcommand", conn);
@@ -37,7 +42,7 @@ public class RobotCommandADO : IRobotCommandDataAccess
 
     public void InsertRobotCommand(RobotCommand command)
     {
-        using var conn = new NpgsqlConnection(CONNECTION_STRING);
+        using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
         using var cmd = new NpgsqlCommand(
@@ -57,7 +62,7 @@ public class RobotCommandADO : IRobotCommandDataAccess
 
     public void UpdateRobotCommand(int id, RobotCommand command)
     {
-        using var conn = new NpgsqlConnection(CONNECTION_STRING);
+        using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
         using var cmd = new NpgsqlCommand(
@@ -82,7 +87,7 @@ public class RobotCommandADO : IRobotCommandDataAccess
 
     public void DeleteRobotCommand(int id)
     {
-        using var conn = new NpgsqlConnection(CONNECTION_STRING);
+        using var conn = new NpgsqlConnection(_connectionString);
         conn.Open();
 
         using var cmd = new NpgsqlCommand(

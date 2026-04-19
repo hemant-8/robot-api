@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using robot_controller_api.Persistence;
 using robot_controller_api.Models;
 
@@ -20,28 +21,30 @@ public class BasicAuthenticationHandler
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        // 🔥 Swagger bypass (no popup)
-        if (Context.Request.Path.StartsWithSegments("/swagger"))
+        // ✅ Allow Swagger + root (no auth required)
+        if (Request.Path.StartsWithSegments("/swagger") || Request.Path == "/")
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        // 🔥 Check Authorization header
-        if (!Context.Request.Headers.ContainsKey("Authorization"))
+        // ✅ Check Authorization header
+        if (!Request.Headers.ContainsKey("Authorization"))
         {
-            Context.Response.Headers.Add("WWW-Authenticate", "Basic");
-            return Task.FromResult(AuthenticateResult.Fail("Missing Header"));
+            return Task.FromResult(AuthenticateResult.Fail("Missing Authorization Header"));
         }
-
-        var authHeader = Context.Request.Headers["Authorization"].ToString();
 
         try
         {
+            var authHeader = Request.Headers["Authorization"].ToString();
+
             var encoded = authHeader.Replace("Basic ", "");
             var bytes = Convert.FromBase64String(encoded);
             var credentials = Encoding.UTF8.GetString(bytes);
 
             var parts = credentials.Split(":");
+            if (parts.Length != 2)
+                return Task.FromResult(AuthenticateResult.Fail("Invalid Header"));
+
             var email = parts[0];
             var password = parts[1];
 
@@ -53,8 +56,11 @@ public class BasicAuthenticationHandler
                 return Task.FromResult(AuthenticateResult.Fail("User not found"));
             }
 
-            // 🔥 FINAL FIX: plain password match (for demo)
-            if (user.PasswordHash != password)
+            // 🔥 SECURE PASSWORD CHECK (HASHED)
+            var hasher = new PasswordHasher<UserModel>();
+            var result = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
+
+            if (result == PasswordVerificationResult.Failed)
             {
                 return Task.FromResult(AuthenticateResult.Fail("Wrong password"));
             }

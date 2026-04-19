@@ -2,6 +2,7 @@ using robot_controller_api.Persistence;
 using robot_controller_api.Authentication;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,14 +26,13 @@ builder.Services.AddSwaggerGen(options =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
-    // 🔥 FIX: same name as authentication scheme
     options.AddSecurityDefinition("BasicAuthentication", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
         Scheme = "basic",
         In = ParameterLocation.Header,
-        Description = "Enter username and password"
+        Description = "Enter email and password"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -51,17 +51,13 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddScoped<IRobotCommandDataAccess, RobotCommandEF>();
-builder.Services.AddScoped<IMapDataAccess, MapEF>();
-builder.Services.AddScoped<RobotContext>();
-builder.Services.AddScoped<UserDataAccess>();
+builder.Services.AddDbContext<RobotContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 🔥 Authentication
 builder.Services.AddAuthentication("BasicAuthentication")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(
         "BasicAuthentication", null);
 
-// 🔥 Authorization policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly",
@@ -71,11 +67,15 @@ builder.Services.AddAuthorization(options =>
         policy => policy.RequireRole("Admin", "User"));
 });
 
+
+builder.Services.AddScoped<IRobotCommandDataAccess, RobotCommandEF>();
+builder.Services.AddScoped<IMapDataAccess, MapEF>();
+builder.Services.AddScoped<UserDataAccess>();
+
 var app = builder.Build();
 
 app.UseStaticFiles();
 
-// 🔥 Swagger (works in Docker + no popup)
 app.UseSwagger();
 app.UseSwaggerUI(setup =>
 {
@@ -83,8 +83,6 @@ app.UseSwaggerUI(setup =>
     setup.RoutePrefix = string.Empty;
     setup.InjectStylesheet("/styles/theme-flattop.css");
 });
-
-app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

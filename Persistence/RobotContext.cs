@@ -15,18 +15,12 @@ public partial class RobotContext : DbContext
     }
 
     public virtual DbSet<Map> Maps { get; set; }
-
     public virtual DbSet<RobotCommand> RobotCommands { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder
-                .UseNpgsql("Host=localhost;Database=sit331;Username=postgres;Password=Hemant@123")
-                .LogTo(Console.Write)
-                .EnableSensitiveDataLogging();
-        }
+        // ✅ REMOVE HARDCODED CONNECTION STRING
+        // Connection will come from Program.cs (appsettings.json)
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
