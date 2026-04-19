@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        SONAR_HOST = 'http://host.docker.internal:9000'
+    }
+
     stages {
 
         stage('Build') {
@@ -25,27 +29,35 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
-            steps {
-                sh 'docker build -t robot-api .'
-            }
-        }
-
         stage('Code Quality (SonarQube)') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:10.0'
+                }
+            }
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     sh '''
-                    docker run --rm \
-                    -e SONAR_HOST_URL=http://host.docker.internal:9000 \
-                    -e SONAR_TOKEN=$SONAR_TOKEN \
-                    -v $(pwd):/usr/src \
-                    sonarsource/sonar-scanner-cli \
-                    -Dsonar.projectKey=robot-api \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://host.docker.internal:9000 \
-                    -Dsonar.token=$SONAR_TOKEN
+                    dotnet tool install --global dotnet-sonarscanner
+                    export PATH="$PATH:/root/.dotnet/tools"
+
+                    dotnet sonarscanner begin \
+                    /k:"robot-api" \
+                    /d:sonar.host.url=$SONAR_HOST \
+                    /d:sonar.login=$SONAR_TOKEN
+
+                    dotnet build robot-controller-api.sln
+
+                    dotnet sonarscanner end \
+                    /d:sonar.login=$SONAR_TOKEN
                     '''
                 }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t robot-api .'
             }
         }
 
