@@ -91,4 +91,17 @@ pipeline {
             }
         }
     }
+
+    post {
+        success {
+            mail to: 'hemantsachdeva19@gmail.com',
+                 subject: "SUCCESS: Build #${BUILD_NUMBER}",
+                 body: "Build successful!\n\nCheck Jenkins: http://localhost:8082"
+        }
+        failure {
+            mail to: 'hemantsachdeva19@gmail.com',
+                 subject: "FAILED: Build #${BUILD_NUMBER}",
+                 body: "Build failed!\n\nCheck logs in Jenkins."
+        }
+    }
 }
