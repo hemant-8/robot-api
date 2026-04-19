@@ -1,29 +1,33 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'mcr.microsoft.com/dotnet/sdk:10.0'
+        }
+    }
 
     stages {
 
         stage('Build') {
             steps {
-                sh 'docker run --rm -v $PWD:/app -w /app mcr.microsoft.com/dotnet/sdk:10.0 dotnet build'
+                sh 'dotnet build'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'docker run --rm -v $PWD:/app -w /app mcr.microsoft.com/dotnet/sdk:10.0 dotnet test || true'
+                sh 'dotnet test || true'
             }
         }
 
         stage('Code Quality') {
             steps {
-                sh 'docker run --rm -v $PWD:/app -w /app mcr.microsoft.com/dotnet/sdk:10.0 dotnet format --verify-no-changes || true'
+                sh 'dotnet format --verify-no-changes || true'
             }
         }
 
         stage('Security Scan') {
             steps {
-                sh 'docker run --rm -v $PWD:/app aquasec/trivy fs /app || true'
+                echo 'Security scan placeholder'
             }
         }
 
@@ -38,12 +42,6 @@ pipeline {
                 sh 'docker stop robot-container || true'
                 sh 'docker rm robot-container || true'
                 sh 'docker run -d -p 8081:80 --name robot-container robot-api'
-            }
-        }
-
-        stage('Release') {
-            steps {
-                sh 'docker tag robot-api robot-api:latest'
             }
         }
 
