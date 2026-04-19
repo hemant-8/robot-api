@@ -2420,11 +2420,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\HD task\\robot-controller-api\\robot-controller-api.csproj",
+      "projectUniqueName": "D:\\HD task\\robot-controller-api.csproj",
       "projectName": "robot-controller-api",
-      "projectPath": "D:\\HD task\\robot-controller-api\\robot-controller-api.csproj",
+      "projectPath": "D:\\HD task\\robot-controller-api.csproj",
       "packagesPath": "C:\\Users\\heman\\.nuget\\packages\\",
-      "outputPath": "D:\\HD task\\robot-controller-api\\obj\\",
+      "outputPath": "D:\\HD task\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\heman\\AppData\\Roaming\\NuGet\\NuGet.Config"
