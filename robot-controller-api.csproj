@@ -10,6 +10,7 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
 
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
 
   </PropertyGroup>
 

@@ -3,7 +3,6 @@ WORKDIR /app
 
 COPY . .
 
-# 🔥 specify project explicitly
 RUN dotnet publish robot-controller-api.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
