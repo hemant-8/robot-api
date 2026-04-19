@@ -52,7 +52,7 @@ pipeline {
             steps {
                 sh 'docker stop robot-container || true'
                 sh 'docker rm robot-container || true'
-                sh 'docker run -d -p 8081:5000 --name robot-container robot-api'
+                sh 'docker run -d -p 8081:8080 --name robot-container robot-api'
             }
         }
 
