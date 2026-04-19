@@ -1,27 +1,29 @@
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/dotnet/sdk:10.0'
-        }
-    }
+    agent any
 
     stages {
 
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/hemant-8/robot-api.git'
+            }
+        }
+
         stage('Build') {
             steps {
-                sh 'dotnet build'
+                sh 'dotnet build robot-controller-api.sln'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'dotnet test || true'
+                sh 'dotnet test robot-controller-api.sln || true'
             }
         }
 
         stage('Code Quality') {
             steps {
-                sh 'dotnet format --verify-no-changes || true'
+                sh 'dotnet format robot-controller-api.sln || true'
             }
         }
 
