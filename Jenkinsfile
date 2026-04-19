@@ -92,16 +92,36 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            mail to: 'hemantsachdeva19@gmail.com',
-                 subject: "SUCCESS: Build #${BUILD_NUMBER}",
-                 body: "Build successful!\n\nCheck Jenkins: http://localhost:8082"
+        post {
+            success {
+                emailext(
+                    to: 'hemantsachdeva19@gmail.com',
+                    subject: "SUCCESS: Build #${BUILD_NUMBER}",
+                    body: """
+                    Build Successful!
+
+                    Project: ${JOB_NAME}
+                    Build Number: ${BUILD_NUMBER}
+
+                    Check details: ${BUILD_URL}
+                    """,
+                    attachLog: true
+                )
+            }
+
+            failure {
+                emailext(
+                    to: 'hemantsachdeva19@gmail.com',
+                    subject: "FAILED: Build #${BUILD_NUMBER}",
+                    body: """
+                    Build Failed!
+
+                    Project: ${JOB_NAME}
+                    Build Number: ${BUILD_NUMBER}
+
+                    Check logs: ${BUILD_URL}
+                    """,
+                    attachLog: true
+                )
+            }
         }
-        failure {
-            mail to: 'hemantsachdeva19@gmail.com',
-                 subject: "FAILED: Build #${BUILD_NUMBER}",
-                 body: "Build failed!\n\nCheck logs in Jenkins."
-        }
-    }
-}
