@@ -75,7 +75,11 @@ app.UseStaticFiles();
 
 app.UseSwagger();
 app.UseSwaggerUI(setup =>
-    setup.InjectStylesheet("/styles/theme-flattop.css"));
+{
+    setup.SwaggerEndpoint("/swagger/v1/swagger.json", "Robot API V1");
+    setup.RoutePrefix = string.Empty; // 🔥 IMPORTANT LINE
+    setup.InjectStylesheet("/styles/theme-flattop.css");
+});
 
 app.UseHttpsRedirection();
 
